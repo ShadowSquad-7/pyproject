@@ -9,6 +9,11 @@ class Settings(BaseSettings):
     PASS: str
     DATABASE_URL: str = ""
 
+    #auth настройка теперь тут
+    SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_TIME: int = 60
+
     @model_validator(mode="after")
     def assemble_db_url(self) -> "Settings":
         
