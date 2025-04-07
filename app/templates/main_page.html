@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}REGA{% endblock %}
+
+{% block content %}
+    <iframe src="http://127.0.0.1:8050" width="100%" height="600px"></iframe>
+    {% if user %}
+        <div class="profile-box">
+            <p>hi, {{ user.email }}!</p>
+        </div>
+    {% endif %}
+{% endblock %}
