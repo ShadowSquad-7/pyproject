@@ -7,3 +7,4 @@ class User(DATA_BASE):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, nullable=False, unique=True, index=True)
     pswrd = Column(String, nullable=False)
+    balance = Column(Integer, default=10000)
