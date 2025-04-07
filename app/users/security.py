@@ -1,8 +1,7 @@
-
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Cookie, Request
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,8 +36,18 @@ def decode_access_token(token: str):
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/token")
 
 
+def get_token_from_cookie(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token missing in cookies"
+        )
+    return token
+
+
 async def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    token: str = Depends(get_token_from_cookie),
     db: AsyncSession = Depends(asession_generator)
 ) -> user_model.User:
     credentials_exception = HTTPException(
