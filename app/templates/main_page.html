@@ -1,12 +1,93 @@
 {% extends "base.html" %}
 
-{% block title %}REGA{% endblock %}
+{% block title %}Currency Dashboard{% endblock %}
 
 {% block content %}
-    <iframe src="http://127.0.0.1:8050" width="100%" height="600px"></iframe>
-    {% if user %}
-        <div class="profile-box">
-            <p>hi, {{ user.email }}!</p>
-        </div>
-    {% endif %}
+
+<iframe src="http://127.0.0.1:8050" width="100%" height="600px"></iframe>
+
+<!-- Профиль или приглашение войти -->
+{% if user %}
+    <!-- Показать данные для авторизованного пользователя -->
+    <aside class="profile-box">
+        <p>куку, {{ user.email }}</p>
+        <p>денег стока: {{ user.balance }}</p>
+        <form method="post" action="/users/logout">
+            <button type="submit">ливнуть</button>
+        </form>
+        <form action="/users/buy" method="get">
+            <button type="submit">купить денег</button>
+        </form>
+    </aside>
+{% else %}
+    <!-- Показать кнопки для входа или регистрации для неавторизованных пользователей -->
+    <aside class="profile-box">
+        <p>регайся, олух</p>
+        <button onclick="toggleModal('loginModal')">я уже смешарик</button>
+        <button onclick="toggleModal('registerModal')">стать смешариком</button>
+    </aside>
+{% endif %}
+
+<!-- Модальное окно логина -->
+<div id="loginModal" class="modal hidden">
+    <form method="post" action="/users/login" class="modal-content">
+        <h3>Никита делай фронт</h3>
+        <input type="email" name="username" placeholder="пошта" required>
+        <input type="password" name="password" placeholder="bruuuh" required>
+        <button type="submit">летс гоу</button>
+        <button type="button" onclick="toggleModal('loginModal')">х</button>
+        {% if login_error %}
+            <p class="error">{{ login_error }}</p>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Модальное окно регистрации -->
+<div id="registerModal" class="modal hidden">
+    <form method="post" action="/users/register-page" class="modal-content">
+        <h3>Никита сделай что б красиво было</h3>
+        <input type="email" name="email" placeholder="пошта" required>
+        <input type="password" name="password" placeholder="я все равно вижу его в базе лол" required>
+        <button type="submit">летс гоу</button>
+        <button type="button" onclick="toggleModal('registerModal')">х</button>
+        {% if register_error %}
+            <p class="error">{{ register_error }}</p>
+        {% endif %}
+    </form>
+</div>
+
+<script>
+function toggleModal(id) {
+    document.getElementById(id).classList.toggle("hidden");
+}
+</script>
+
+<style>
+.modal.hidden { display: none; }
+.modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: white;
+    padding: 2em;
+    border-radius: 8px;
+}
+.profile-box {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: lightgray;
+    padding: 1em;
+    border-radius: 8px;
+}
+.error {
+    color: red;
+}
+</style>
+
 {% endblock %}
