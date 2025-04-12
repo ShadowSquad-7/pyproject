@@ -1,0 +1,27 @@
+{% block title %}MARKET{% endblock %}
+
+{% block content %}
+    <h1>buy currency</h1>
+
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+
+    <form method="post" action="/users/buy">
+        <label for="curr">pizdec:</label>
+        <select name="curr" id="curr" required>
+            <option value="BTC">BTC</option>
+            <option value="USD">USD</option>
+            <option value="EUR">EUR</option>
+            <option value="CNY">CNY</option>
+        </select>
+
+        <label for="amount_value">Количество:</label>
+        <input type="number" step="0.01" name="amount_value" required>
+
+        <button type="submit">Купить</button>
+    </form>
+
+    <br>
+    <a href="/" style="text-decoration: none; background: lightgray; padding: 6px 10px; border-radius: 6px;">На главную</a>
+{% endblock %}
