@@ -1,4 +1,6 @@
+
 from datetime import datetime, timedelta
+from typing import Annotated
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status, Cookie, Request
@@ -10,6 +12,10 @@ from app.conf import settings
 from app.users import crud, model as user_model
 from app.database import asession_generator
 from app.conf import settings
+
+async def get_db():
+    async with asession_generator() as session:
+        yield session
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -26,46 +32,22 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None ):
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
-def decode_access_token(token: str):
-    try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        return payload
-    except JWTError:
-        return None
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/token")
-
-
-def get_token_from_cookie(request: Request):
-    token = request.cookies.get("access_token")
-    if not token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token missing in cookies"
-        )
-    return token
-
-
 async def get_current_user(
-    token: str = Depends(get_token_from_cookie),
-    db: AsyncSession = Depends(asession_generator)
-) -> user_model.User:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Не удалось проверить учетные данные",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-
+    reqest: Request,
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    token = reqest.cookies.get("access_token")
+    if token is None:
+        return None
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         email: str = payload.get("sub")
         if email is None:
-            raise credentials_exception
+            return None
     except JWTError:
-        raise credentials_exception
-
+        return None
     user = await crud.get_user_by_email(db, email=email)
     if user is None:
-        raise credentials_exception
-
+        return None
+    
     return user
