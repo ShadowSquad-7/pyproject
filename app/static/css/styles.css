@@ -5,14 +5,14 @@
   flex-wrap: wrap;
 }
 
-/* Скрываем стандартный radio */
+
 .dash-radio-items input[type="radio"] {
   display: none;
 }
 
-/* Общий стиль кнопок */
+
 .dash-radio-items label {
-  background-color: #043b5b; /* темно-синий по умолчанию */
+  background-color: #043b5b; 
   color: white;
   border: none;
   padding: 10px 16px;
@@ -22,18 +22,18 @@
   transition: background-color 0.3s ease;
 }
 
-/* Hover-состояние */
+
 .dash-radio-items label:hover {
   background-color: #005b8f;
 }
 
-/* Активная кнопка — голубая */
+
 .dash-radio-items label:has(input[type="radio"]:checked) {
   background-color: #00b4db;
   box-shadow: 0 0 8px rgba(0, 180, 219, 0.5);
   color: white;
 }
-/* Группа чекбоксов */
+
 .custom-ma-med {
   display: flex;
   justify-content: left;
@@ -41,12 +41,12 @@
   flex-wrap: wrap;
 }
 
-/* Скрываем стандартный checkbox */
+
 .custom-ma-med input[type="checkbox"] {
   display: none;
 }
 
-/* Стиль label (обёртки чекбокса) */
+
 .custom-ma-med label {
   background-color: #043b5b;
   color: white;
@@ -61,12 +61,12 @@
   position: relative;
 }
 
-/* Удаляем галочку изнутри кнопки */
+
 .custom-ma-med label::before {
   display: none;
 }
 
-/* Стилизация активного чекбокса через :has */
+
 .custom-ma-med label:has(input[type="checkbox"]:checked) {
   background-color: #00b4db;
   box-shadow: 0 0 8px rgba(0, 180, 219, 0.5);
@@ -210,7 +210,7 @@ body {
   background-color: #009fc2;
 }
 
-/* Скрытое меню */
+
 .side-menu {
   position: fixed;
   top: 0;
@@ -258,7 +258,7 @@ body {
   display: flex !important;
   justify-content: center;
   align-items: center;
-  z-index: 2000; /* <-- ВАЖНО */
+  z-index: 2000; 
 }
 
 .modal-content {
