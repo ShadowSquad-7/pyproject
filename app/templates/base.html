@@ -1,21 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Currency Dashboard{% endblock %}</title>
-    <link
-      href="{{ url_for('static', path='/css/styles.css') }}"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-left">
+            <h1>
+                <a href="/" class="header-logo-link">
+                Currency Dashboard<img src="/static/images/dash.png"
+                 alt="Dashboard Icon"
+                 class="header-icon-1">
+                </a>
+            </h1>
+        </div>
+        <div class="header-right">
+            {% block header_right %}
+                <!-- Блок для кнопок авторизации/профиля -->
+                {% if user %}
+                    <div class="user-info">
+                        <form method="post" action="/users/logout" class="logout-form">
+                            <button type="submit" class="logout-btn">Log out</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <button onclick="toggleModal('loginModal')" class="auth-btn">Sign in</button>
+                    <button onclick="toggleModal('registerModal')" class="auth-btn register-btn">Sign up</button>
+                {% endif %}
+            {% endblock %}
+        </div>
+    </header>
 
-    <link href="https://fonts-online.ru/fonts/good-times" rel="stylesheet" />
-    <link href="https://fonts-online.ru/fonts/moscow2024" rel="stylesheet" />
-  </head>
-  <body>
-    <main>{% block content %}{% endblock %}</main>
-  </body>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2025 TeamX</p>
+        <p>All rights reserved</p>
+    </footer>
+</body>
 </html>

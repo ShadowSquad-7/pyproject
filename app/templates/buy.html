@@ -1,27 +1,75 @@
-{% block title %}MARKET{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Buy Currency{% endblock %}
 
 {% block content %}
-    <h1>buy currency</h1>
+<div class="buy-page-container">
+    <div class="buy-header">
+        <h1 class="page-title"><img src="/static/images/dash.png" class="b-icon">Buy Currency<img src="/static/images/dash.png" class="b-icon"></h1>
+        
+        {% if error %}
+            <p class="error-message">{{ error }}</p>
+        {% endif %}
+    </div>
 
-    {% if error %}
-        <p style="color:red;">{{ error }}</p>
-    {% endif %}
+    <div class="buy-form-container">
+        <form method="post" action="/users/buy" class="currency-form">
+            <div class="form-group">
+                <label for="curr" class="form-label">Currency:</label>
+                <select name="curr" id="curr" class="form-select" required>
+                    <option value="BTC">BTC</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="CNY">CNY</option>
+                </select>
+            </div>
 
-    <form method="post" action="/users/buy">
-        <label for="curr">pizdec:</label>
-        <select name="curr" id="curr" required>
-            <option value="BTC">BTC</option>
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="CNY">CNY</option>
-        </select>
+            <div class="form-group">
+                <label for="amount_value" class="form-label">Amount:</label>
+                <input type="number" step="0.01" name="amount_value" class="form-input" required>
+            </div>
 
-        <label for="amount_value">Количество:</label>
-        <input type="number" step="0.01" name="amount_value" required>
+            <div class="form-actions">
+                <button type="submit" class="action-btn buy-btn">
+                    <img src="/static/images/trade.png" class="trade-icon-sm">Buy
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="buy-page-container">
+    <div class="buy-header">
+        <h1 class="page-title"><img src="/static/images/dash.png" class="b-icon">Sell Currency<img src="/static/images/dash.png" class="b-icon"></h1>
+        
+        {% if error %}
+            <p class="error-message">{{ error }}</p>
+        {% endif %}
+    </div>
 
-        <button type="submit">Купить</button>
-    </form>
+    <div class="buy-form-container">
+        <form method="post" action="/users/buy" class="currency-form">
+            <div class="form-group">
+                <label for="curr" class="form-label">Currency:</label>
+                <select name="curr" id="curr" class="form-select" required>
+                    <option value="BTC">BTC</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="CNY">CNY</option>
+                </select>
+            </div>
 
-    <br>
-    <a href="/" style="text-decoration: none; background: lightgray; padding: 6px 10px; border-radius: 6px;">На главную</a>
+            <div class="form-group">
+                <label for="amount_value" class="form-label">Amount:</label>
+                <input type="number" step="0.01" name="amount_value" class="form-input" required>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="action-btn buy-btn">
+                    <img src="/static/images/trade.png" class="trade-icon-sm">
+                    Sell
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
