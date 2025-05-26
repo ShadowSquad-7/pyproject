@@ -1,0 +1,507 @@
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-header {
+    background-color: #6146a5;
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+main {
+    flex: 1;
+    padding: 2rem;
+    position: relative;
+}
+
+.main-footer {
+    background-color:  #6146a5;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+}
+
+.modal.hidden { 
+    display: none; 
+}
+
+.modal {
+    color: #6a4ebf;
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    align-items: center;
+    text-align: center;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-container {
+    align-items: center;
+    color: #6146a5;
+    background-color: #e3deed; /* Светло-фиолетовый фон как в профиле */
+    padding: 2em;
+    border-radius: 12px; /* Увеличили скругление */
+    width: 320px; /* Немного шире */
+    max-width: 90%;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+    border: 1px solid #b8a9ff; /* Тонкая фиолетовая рамка */
+}
+
+.modal.active .modal-content {
+    transform: translateY(0);
+    align-items: center;
+}
+
+
+.modal-content input {
+    width: 100%;
+    padding: 0.8em;
+    margin: 0.5em 0 1em;
+    border: 2px solid #b8a9ff;
+    border-radius: 6px;
+    background: white;
+    color: #2a1a5e;
+    box-sizing: border-box;
+}
+
+.modal-content input:focus {
+    outline: none;
+    border-color: #7d5ecd;
+    margin-top: 10px;
+    box-shadow: 0 0 0 3px rgba(125, 94, 205, 0.2);
+}
+
+.modal-content button {
+    width: 100%;
+    padding: 0.8em;
+    margin: 0.5em 0;
+    background: #7d5ecd; /* Фиолетовая кнопка */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.modal-content button[type="button"] {
+    background: #e3deed;
+    color: #6146a5;
+    border: 1px solid #b8a9ff;
+}
+
+.modal-content button:hover {
+    background: #6a4ebf; /* Темнее при наведении */
+}
+
+.modal-content button[type="button"]:hover {
+    background: #d0c6e8;
+}
+.modal-title{
+    color: #6146a5;
+}
+
+.error {
+    color: #e74c3c;
+    background: rgba(231, 76, 60, 0.1);
+    padding: 0.8em;
+    border-radius: 6px;
+    margin-top: 1em;
+    text-align: center;
+    font-size: 0.9em;
+}
+
+/* Расположение кнопок */
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 1.5em;
+}
+
+.modal-actions button {
+    flex: 1;
+}
+
+button {
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.5rem 1rem;
+    margin: 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color:  #6146a5;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+.auth-btn{
+    background-color: white;
+    color: #6146a5;
+}
+.logout-btn{
+    background-color: white;
+    color: #6146a5;
+}
+
+
+button:hover {
+    background-color: #9378d7;
+    animation: gentleScale 0.3s ease forwards;
+}
+
+@keyframes gentleScale {
+    0% {
+        transform: scale(1);
+    }
+    100% {
+        transform: scale(1.05);
+    }
+}
+
+.header-icon {
+    height: 1.1em;
+    width: auto;
+    vertical-align: middle; 
+    filter: brightness(0) invert(1);
+    transition: transform 0.3s ease;
+}
+.header-icon-e{
+    height: 1.1em;
+    width: auto;
+    vertical-align: middle; 
+    filter: brightness(0) saturate(100%) invert(39%) sepia(59%) saturate(586%) hue-rotate(218deg) brightness(89%) contrast(89%);
+    transition: transform 0.3s ease;
+}
+
+.header-icon-1{
+    height: 1.1em;
+    width: auto;
+    vertical-align: middle; 
+    margin-left: 10px;
+    filter: brightness(0) invert(1);
+    transition: transform 0.3s ease;
+}
+
+.header-icon-1:hover {
+    transform: rotate(20deg);
+}
+
+.header-icon-u{
+    height: 5em;
+    width: auto;
+    vertical-align: middle;
+    border-radius: 10px;
+    background-color: rgb(158, 191, 80);
+    filter: invert(1);
+}
+
+
+.head-elements {
+    position: relative;
+    right: 10px;
+    display: flex;
+    gap: 10px;
+    z-index: 2;
+}
+
+.profile-box {
+    font-weight: 600;
+    color: #6146a5;
+    background: #e3deed;
+    padding: 0.5em;
+    border-radius: 8px;
+    min-width: 200px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-left: 5px;
+}
+
+.trade-box {
+    background: #6146a5;
+    margin-left: 5px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex; /* Добавляем flex */
+    align-items: stretch; /* Растягиваем содержимое */
+}
+
+.trade-box form {
+    display: flex;
+    width: 100%;
+}
+
+.trade-btn {
+    margin: 0   ;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 45px;
+    height: 100%;
+    width: 100%;
+    color: white;
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    cursor: pointer;
+    gap: 1em; /* Расстояние между иконкой и текстом */
+}
+
+.trade-icon {
+    width: 4em; /* Размер иконки */
+    height: 4em;
+    filter: brightness(0) invert(1); /* Делаем иконку белой */
+    object-fit: contain;
+}
+
+.trade-text {
+    font-size: 0.9em;
+}
+
+/* Эффекты при наведении */
+.trade-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.trade-btn:hover .trade-icon {
+    transform: translateY(-2px); /* Легкий подъем иконки */
+    transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .head-elements {
+        position: static;
+        flex-direction: column;
+        width: 100%;
+        margin-top: 10px;
+    }
+    
+    .trade-box {
+        height: 44px; /* Фиксированная высота на мобильных */
+    }
+}
+
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* На всю высоту viewport */
+}
+.content-block {
+    flex-grow: 1; /* Занимает всё оставшееся пространство */
+    background-color: #2a1a5e; /* Фиолетовый фон (пример) */
+    padding: 20px;
+    
+    /* Для красивого скругления углов */
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -5px 15px rgba(79, 38, 103, 0.2);
+}
+
+.header-container {
+    display: flex;
+    width: 100%;
+    position: absolute;
+    top: 20px;
+    left: 0;
+    padding: 0 20px;
+    box-sizing: border-box;
+    align-items: center; /* Выравниваем по вертикали */
+}
+
+.right-fill-block {
+    color: #6146a5;
+    overflow: hidden;
+    flex-grow: 1;
+    background: #e3deed; /* Полупрозрачный фон */
+    border-radius: 10px;
+    margin-left: 5px;
+    padding-left: 2%;
+    backdrop-filter: blur(5px); /* Эффект размытия */
+    text-align: center;
+}
+.profile-box, 
+.trade-box, 
+.right-fill-block {
+    height: 200px; /* Фиксированная высота */
+    min-height: 200px; /* Защита от сжатия */
+    box-sizing: border-box;
+    font-weight: 600;
+}
+
+.balance-grid {
+    display: flex; /* Чтобы сетка занимала только нужную ширину */
+    gap: 30%; /* Расстояние между колонками */
+    justify-content: center;
+    margin: 3px;
+}
+
+.balance-column {
+    text-align: left; /* Текст в колонках выравниваем по левому краю */
+}
+
+.b-icon{
+    height: 1.5em;
+    width: auto;
+    margin-left: 7px;
+    margin-right: 7px;
+    vertical-align: middle;
+    border-radius: 2px;
+    filter: brightness(0) saturate(100%) invert(39%) sepia(59%) saturate(586%) hue-rotate(218deg) brightness(89%) contrast(89%);
+}
+
+.header-logo-link{
+    color: white;
+    text-decoration: none;
+}
+
+/* Контейнер страницы покупки */
+.buy-page-container {
+    max-width: 800px;
+    margin: 100px auto 2rem;
+    padding: 2rem;
+    background: #e3deed;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+/* Заголовок */
+.buy-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    color: #6146a5;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.error-message {
+    color: #722366;
+    background: rgba(231, 76, 60, 0.1);
+    padding: 0.8rem;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+/* Форма */
+.currency-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.form-label {
+    color: #6146a5;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.form-select, 
+.form-input {
+    padding: 1rem;
+    border: 2px solid #b8a9ff;
+    border-radius: 8px;
+    background: white;
+    color: #2a1a5e;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+.form-select:focus, 
+.form-input:focus {
+    border-color: #7d5ecd;
+    box-shadow: 0 0 0 3px rgba(125, 94, 205, 0.3);
+    outline: none;
+}
+
+/* Кнопка */
+.action-btn {
+    padding: 1rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.buy-btn {
+    background-color: #7d5ecd;
+    color: white;
+    width: 100%;
+}
+
+.buy-btn:hover {
+    background-color: #6a4ebf;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(125, 94, 205, 0.3);
+}
+
+.trade-icon-sm {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) invert(1);
+}
+
+
+.form-actions {
+    display: flex;
+    justify-content: center; /* Центрируем кнопку */
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+.action-btn {
+    width: auto; /* Отменяем 100% ширину */
+    min-width: 200px; /* Минимальная ширина */
+    padding: 1rem 2rem; /* Больше отступов по бокам */
+}
+
+/* Для мобильных */
+@media (max-width: 768px) {
+    .form-actions {
+        justify-content: stretch; /* На мобильных растягиваем */
+    }
+    .action-btn {
+        width: 100%;
+    }
+}
+
