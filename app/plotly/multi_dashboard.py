@@ -3,11 +3,32 @@ import pandas as pd
 import plotly.graph_objects as go
 from datetime import timedelta
 from pathlib import Path
+import os
 
 pn.extension("plotly")
 
-# ─── КОНФИГ ─────────────────────────────────────────────
-BASE_DIR = Path(__file__).resolve().parents[2] / "data"
+pn.config.raw_css = ["""
+.dashboard-container {
+  top: 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.bk-input {
+  background-color: #003366 !important;
+  padding: 6px 12px;
+  border-radius: 5px !important;
+  margin: 10px;
+  color: white !important;
+  border: 1px solid #555 !important;
+}
+"""]
+
+
+
+
+# Конфиг
+BASE_DIR = Path(__file__).resolve().parents[1] / "data"
 
 COLOR_SCHEMES = {
     "Стандартная": {"up": "#2ECC71", "down": "#E74C3C"},
@@ -32,7 +53,7 @@ CURRENCY_FILES = {
 # Кэш последнего времени изменения csv
 _LAST_MTIME = {}
 
-# ─── УТИЛИТЫ ───────────────────────────────────────────
+
 
 def load_data(cur: str) -> pd.DataFrame:
     file = BASE_DIR / CURRENCY_FILES[cur]
@@ -81,36 +102,50 @@ def make_plot(df: pd.DataFrame, title: str, colors: dict):
     return fig
 
 
-# ─── ВИДЖЕТЫ ───────────────────────────────────────────
-currency = pn.widgets.Select(
-    name="Валюта", options=list(CURRENCY_FILES.keys()), value="USD"
-)
+# Чтение параметров из URL
+def get_url_params():
+    try:
+        args = pn.state.session_args 
+        return {k: v[0].decode() for k, v in args.items()}
+    except Exception:
+        return {}
+
+params = get_url_params()
+default_currency = params.get("currency", "USD")
+
+
+
+# Виджеты
+selected_currency = pn.widgets.StaticText(name="Валюта", value=default_currency if default_currency in CURRENCY_FILES else "USD")
+
+
+
 period = pn.widgets.Select(
-    name="Период", options=list(INTERVAL_CONFIG.keys()), value="1 неделя"
+     options=list(INTERVAL_CONFIG.keys()), value="1 неделя"
 )
 scheme = pn.widgets.Select(
-    name="Цветовая схема", options=list(COLOR_SCHEMES.keys()), value="Стандартная"
+     options=list(COLOR_SCHEMES.keys()), value="Стандартная"
 )
 
 
-# ─── ИНИЦИАЛЬНОЕ СОЗДАНИЕ ГРАФИКА ─────────────────────────
+# Создание графика
 
 def create_initial_fig():
-    df = load_data(currency.value)
+    df = load_data(selected_currency.value)
     if df.empty:
         fig = go.Figure()
         fig.update_layout(title="Нет данных", template="plotly_dark")
         return fig
     df = df[df.index >= df.index.max() - INTERVAL_CONFIG[period.value]]
-    title = f"{currency.value} ➜ {'USD' if currency.value=='BTC' else 'RUB'}  ({period.value})"
+    title = f"{selected_currency.value} ➜ {'USD' if selected_currency.value=='BTC' else 'RUB'}  ({period.value})"
     return make_plot(df, title, COLOR_SCHEMES[scheme.value])
 
 
 # Создаем панель с первоначальным объектом графика
-plotly_pane = pn.pane.Plotly(create_initial_fig(), height=500)
+plotly_pane = pn.pane.Plotly(create_initial_fig(), height=500, sizing_mode="fixed", width=1200)
 
 
-# ─── ФУНКЦИЯ ОБНОВЛЕНИЯ ──────────────────────────
+#Обновление
 
 def _file_modified(path: Path) -> bool:
     """Возвращает True, если файл изменился со времени последнего чтения."""
@@ -132,14 +167,14 @@ def _apply_interval_filter(df: pd.DataFrame) -> pd.DataFrame:
 
 def update_plot(force: bool = False):
     """Обновление графика без перезагрузки страницы."""
-    file_path = BASE_DIR / CURRENCY_FILES[currency.value]
+    file_path = BASE_DIR / CURRENCY_FILES[selected_currency.value]
 
     # Выходим, если csv не менялся и нет принудительного обновления
     if not force and not _file_modified(file_path):
         return
 
     try:
-        df = load_data(currency.value)
+        df = load_data(selected_currency.value)
     except Exception as err:
         plotly_pane.object = go.Figure(layout=dict(title=f"Ошибка чтения: {err}", template="plotly_dark"))
         return
@@ -149,7 +184,7 @@ def update_plot(force: bool = False):
         return
 
     df = _apply_interval_filter(df)
-    title = f"{currency.value} ➜ {'USD' if currency.value=='BTC' else 'RUB'}  ({period.value})"
+    title = f"{selected_currency.value} ➜ {'USD' if selected_currency.value=='BTC' else 'RUB'}  ({period.value})"
 
     fig = plotly_pane.object
     if fig and fig.data:
@@ -162,27 +197,26 @@ def update_plot(force: bool = False):
         candle.increasing.line.color = COLOR_SCHEMES[scheme.value]["up"]
         candle.decreasing.line.color = COLOR_SCHEMES[scheme.value]["down"]
         fig.update_layout(title=title)
-        # Даем знать Panel, что объект изменился
+
         plotly_pane.param.trigger("object")
     else:
         plotly_pane.object = make_plot(df, title, COLOR_SCHEMES[scheme.value])
 
 
-# ─── ОБРАБОЧИКИ ─────────────────────────────────────
-# Проверяем csv каждые 3 секунды
+
 pn.state.curdoc.add_periodic_callback(update_plot, 3_000)
 
-# При смене любого виджета обновляем график принудительно
-for widget in (currency, period, scheme):
+
+for widget in (period, scheme):
     widget.param.watch(lambda *_: update_plot(force=True), "value")
 
 
-# ─── СБОРКА ДАШБОРДА ─────────────────────────────────
+
 dashboard = pn.Column(
-    "# Курс валют и биточка (обновление в ре‑тайме)",
-    pn.Row(currency, period, scheme),
+    pn.Row(period, scheme),
     plotly_pane,
-    pn.pane.Markdown("**Примечание:** данные подгружаются автоматически при изменении CSV, перезагрузка не требуется.")
+    css_classes=["dashboard-container"]
 )
+
 
 dashboard.servable()
