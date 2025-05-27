@@ -1,124 +1,196 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block title %}Currency Dashboard{% endblock %} {%
+block content %}
 
-{% block title %}Currency Dashboard{% endblock %}
-
-{% block content %}
-<!-- Профиль или приглашение войти -->
-{% if user %}
-    
-    <!-- Показать данные для авторизованного пользователя -->
-     <div class="header-container">
-    <div class="head-elements">
-        <aside class="profile-box">
-            <p>Welcome, {{ user.email }}</p>
-            <p><img src="/static/images/userimg.png" alt="User Icon" class="header-icon-u"></p>
-        </aside>
-        <div class="trade-box">
-            <form action="/users/buy" method="get">
-                <button type="submit" class="trade-btn">
-                    <img src="/static/images/trade.png" class="trade-icon" alt="Trade">
-                    Trade
-                </button>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Новый растягивающийся блок -->
-    <div class="right-fill-block">
-        <div class="fill-content">
-            <h3 class="h5-f"><img src="/static/images/wallet.png" alt="User Icon" class="b-icon">Balance<img src="/static/images/wallet.png" alt="User Icon" class="b-icon"></h3>
-            <div class="balance-grid">
-            <div class="balance-column">
-                <p>{{user.balance}} cookies</p>
-                <p>{{user.btc_balance}} BTC</p>
-                <p>{{user.usd_balance}} USD</p>
-            </div>
-            <div class="balance-column">
-                <p>{{user.eur_balance}} EUR</p>
-                <p>{{user.cny_balance}} CNY</p>
-            </div>
-        </div>
-        </div>
-    </div>
-    
+<div class="header">
+  <button class="menu-button" onclick="toggleMenu()">☰</button>
+  <div class="auth-buttons">
+    {% if user %}
+    <form method="post" action="/users/logout" style="display: inline">
+      <button type="submit">Log Out</button>
+    </form>
+    <form action="/users/buy" method="get" style="display: inline">
+      <button type="submit">Купить что-то</button>
+    </form>
+    {% else %}
+    <button onclick="toggleModal('loginModal')">SIGN IN</button>
+    <button onclick="toggleModal('registerModal')">LOG IN</button>
+    {% endif %}
+  </div>
 </div>
-    
-{% else %}
-    <!-- Показать кнопки для входа или регистрации для неавторизованных пользователей -->
-    <!-- <aside class="profile-box">
-    </aside> -->
-{% endif %}
 
+<div class="side-menu" id="menu">
+  <h4>Меню</h4>
+  <p>Настройки</p>
+  <p>Что-то ещё</p>
+</div>
+
+<div class="container">
+  <div class="chart-title">
+    <img
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/180px-Bitcoin.svg.png"
+      alt="BTC"
+      style="width: 30px; vertical-align: middle"
+    />
+    <span id="currency-label">BTC TO USD</span>
+
+    <div class="dropdown">
+      <button
+        class="btn custom-dropdown-toggle dropdown-toggle"
+        type="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      ></button>
+      <ul class="dropdown-menu">
+        <li>
+          <button class="dropdown-item currency-button" data-currency="BTC">
+            BTC
+          </button>
+        </li>
+        <li>
+          <button class="dropdown-item currency-button" data-currency="USD">
+            USD
+          </button>
+        </li>
+        <li>
+          <button class="dropdown-item currency-button" data-currency="CNY">
+            CNY
+          </button>
+        </li>
+        <li>
+          <button class="dropdown-item currency-button" data-currency="EUR">
+            EUR
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="chart-placeholder">
+    <div class="iframe-wrapper">
+      <iframe
+        id="currencyFrame"
+        src="http://localhost:5006/multi_dashboard?currency=BTC"
+        allowfullscreen
+        loading="lazy"
+      ></iframe>
+    </div>
+  </div>
+  <div class="currency-info">
+    <h2 style="font-size: 3rem">Описание валюты</h2>
+    <p id="currency-description" style="font-size: 16pt">
+      Биткоин — первая и самая известная криптовалюта.
+    </p>
+  </div>
+</div>
+
+<script>
+  function toggleMenu() {
+    const menu = document.getElementById("menu");
+    menu.classList.toggle("show");
+  }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Модальное окно логина -->
 <div id="loginModal" class="modal hidden">
-    <div class="modal-overlay" onclick="toggleModal('loginModal')"></div>
-    <div class="modal-container">
-        <form method="post" action="/users/login" class="modal-form">
-            <div class="modal-header">
-                <h3 class="modal-title">Log in</h3>
-                <button type="button" class="modal-close" onclick="toggleModal('loginModal')">
-                    <img src="/static/images/close.png" alt="Close" class="header-icon">
-                </button>
-            </div>
-            
-            <div class="form-group">
-                <input type="text" name="username" placeholder="Username" class="modal-input" required>
-            </div>
-            
-            <div class="form-group">
-                <input type="password" name="password" placeholder="Password" class="modal-input" required>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="modal-submit-btn">
-                    <img src="/static/images/login.png" alt="Login" class="header-icon">
-                </button>
-            </div>
-            
-            {% if login_error %}
-                <div class="modal-error">
-                    <img src="/static/images/error.png" alt="Error" class="header-icon-e">
-                    <p>{{ login_error }}</p>
-                </div>
-            {% endif %}
-        </form>
-    </div>
+  <form method="post" action="/users/login" class="modal-content">
+    <h3>Вход</h3>
+
+    <input
+      type="email"
+      name="username"
+      placeholder="Email"
+      required
+      class="input-with-icon"
+    />
+
+    <input
+      type="password"
+      name="password"
+      placeholder="Пароль"
+      required
+      class="input-with-icon"
+    />
+    <button type="submit">Войти</button>
+    <button type="button" onclick="toggleModal('loginModal')">Закрыть</button>
+    {% if login_error %}
+    <p class="error">{{ login_error }}</p>
+    {% endif %}
+  </form>
 </div>
 
-<!-- Модальное окно регистрации -->
+
 <div id="registerModal" class="modal hidden">
-    <div class="modal-overlay" onclick="toggleModal('registerModal')"></div>
-    <div class="modal-container">
-        <form method="post" action="/users/register" class="modal-form">
-            <div class="modal-header">
-                <h3 class="modal-title">Create Account</h3>
-                <button type="button" class="modal-close" onclick="toggleModal('registerModal')">
-                    <img src="/static/images/close.png" alt="Close" class="header-icon">
-                </button>
-            </div>
-            
-            <div class="form-group">
-                <input type="text" name="login" placeholder="Username" class="modal-input" required>
-            </div>
-            
-            <div class="form-group">
-                <input type="password" name="password" placeholder="Create Password" class="modal-input" required>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="modal-submit-btn">
-                    <img src="/static/images/signup.png" alt="Sign Up" class="header-icon">
-                </button>
-            </div>
-            
-            {% if register_error %}
-                <div class="modal-error">
-                    <img src="/static/images/error.png" alt="Error" class="header-icon-e">
-                    <p>{{ register_error }}</p>
-                </div>
-            {% endif %}
-        </form>
-    </div>
+  <form method="post" action="/users/register-page" class="modal-content">
+    <h3>Регистрация</h3>
+    <input
+      type="email"
+      name="email"
+      placeholder="Email"
+      required
+      class="input-with-icon"
+    />
+    <input
+      type="password"
+      name="password"
+      placeholder="Пароль"
+      required
+      class="input-with-icon"
+    />
+    <!-- Надо бы иконки перед текстом -->
+    <button type="submit">Зарегистрироваться</button>
+    <button type="button" onclick="toggleModal('registerModal')">
+      Закрыть
+    </button>
+    {% if register_error %}
+    <p class="error">{{ register_error }}</p>
+    {% endif %}
+  </form>
 </div>
-<script src="/static/js/scripts.js"></script>
+
+<script>
+  function toggleModal(id) {
+    document.getElementById(id).classList.toggle("hidden");
+  }
+</script>
+
+<script>
+  const descriptions = {
+    BTC: "Биткоин — это децентрализованная цифровая валюта одноименной пиринговой платежной системы, где пользователи осуществляют операции самостоятельно, без централизованного контроля и посредников",
+    USD: "Доллар США — денежная единица США, одна из основных резервных валют мира",
+    EUR: "Евро — официальная валюта еврозоны и вторая по распространённости в мире",
+    CNY: "Китайский юань — официальная валюта КНР, важная в мировой торговле",
+  };
+
+  function changeCurrency(currency) {
+
+    const iframe = document.getElementById("currencyFrame");
+    iframe.src = `http://localhost:5006/multi_dashboard?currency=${currency}`;
+
+
+    const desc = descriptions[currency] || "Описание недоступно.";
+    document.getElementById("currency-description").innerText = desc;
+
+    const toCurrency = currency === "BTC" ? "USD" : "RUB";
+    document.getElementById(
+      "currency-label"
+    ).innerText = `${currency} TO ${toCurrency}`;
+
+
+    document
+      .querySelectorAll(".dropdown-item")
+      .forEach((btn) => btn.classList.remove("active"));
+    document
+      .querySelector(`.dropdown-item[data-currency="${currency}"]`)
+      ?.classList.add("active");
+  }
+
+
+  document.querySelectorAll(".currency-button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const currency = btn.dataset.currency;
+      changeCurrency(currency);
+    });
+  });
+</script>
+
 {% endblock %}
