@@ -121,7 +121,7 @@ selected_currency = pn.widgets.StaticText(name="Валюта", value=default_cur
 
 
 period = pn.widgets.Select(
-     options=list(INTERVAL_CONFIG.keys()), value="1 неделя"
+     options=list(INTERVAL_CONFIG.keys()), value="1 год"
 )
 scheme = pn.widgets.Select(
      options=list(COLOR_SCHEMES.keys()), value="Стандартная"
