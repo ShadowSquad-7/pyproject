@@ -18,8 +18,9 @@ templates = Jinja2Templates(directory="app/templates")
 
 
 @app.get("/", response_class=HTMLResponse)
-async def read_main(request: Request, user: model.User | None = Depends(get_current_user)):
+async def read_main(request: Request, currency: str = "BTC"):
     return templates.TemplateResponse("main_page.html", {
         "request": request,
-        "user" : user,
+        "user": user,
+        "currency": currency
     })
