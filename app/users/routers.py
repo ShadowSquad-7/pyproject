@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 
-from app.users import crud, schemas, security, model as user_model
+from app.users import crud, schemas, security
 from app.users.security import get_db
 from app.parcers.parcer import get_value
 
@@ -92,13 +92,54 @@ async def buy_currency(
         return templates.TemplateResponse("buy.html", {
             "request": request,
             "user" : user,
-            "error": "malo denek",
+            "error": "insufficient funds",
             "prices": prices
+        })
+    if amount_value<0:
+        return templates.TemplateResponse("buy.html", {
+            "request": request,
+            "user" : user,
+            "error": "invalid value",
         })
     user.balance -= amount_value*price
     curr_attr = f'{curr.lower()}_balance'
     if not getattr(user, curr_attr):
         setattr(user, curr_attr, 0.0)
     setattr(user, curr_attr, getattr(user, curr_attr)+amount_value)
+    await db.commit()
+    return RedirectResponse(url="/users/buy", status_code=302)
+
+@router.post("/sell")
+async def sell(
+    request: Request,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    amount_value: float = Form(...),
+    user=Depends(security.get_current_user),
+    curr: str = Form(...),
+):
+    prices = {
+        'BTC': get_value(),
+        'USD': get_value(),
+        'EUR': get_value(),
+        'CNY': get_value(),
+    }
+    price = prices.get(str(curr))
+    type_balance=f'{curr.lower()}_balance'
+    n_balance = getattr(user, type_balance)
+    if n_balance*price < amount_value:
+        return templates.TemplateResponse("buy.html", {
+            "request": request,
+            "user" : user,
+            "error": "insufficient funds",
+            "prices": prices
+        })
+    if amount_value<0:
+        return templates.TemplateResponse("buy.html", {
+            "request": request,
+            "user" : user,
+            "error": "invalid value",
+        })
+    setattr(user, type_balance, n_balance-amount_value)
+    user.balance+=price*amount_value
     await db.commit()
     return RedirectResponse(url="/users/buy", status_code=302)
