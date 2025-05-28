@@ -81,12 +81,7 @@ async def buy_currency(
     user=Depends(security.get_current_user),
     curr: str = Form(...)
 ):
-    prices = {
-        'BTC': get_value(),
-        'USD': get_value(),
-        'EUR': get_value(),
-        'CNY': get_value(),
-    }
+    prices = get_value()
     price = prices.get(str(curr))
     if user.balance/price < amount_value:
         return templates.TemplateResponse("buy.html", {
@@ -117,16 +112,11 @@ async def sell(
     user=Depends(security.get_current_user),
     curr: str = Form(...),
 ):
-    prices = {
-        'BTC': get_value(),
-        'USD': get_value(),
-        'EUR': get_value(),
-        'CNY': get_value(),
-    }
+    prices = get_value()
     price = prices.get(str(curr))
     type_balance=f'{curr.lower()}_balance'
     n_balance = getattr(user, type_balance)
-    if n_balance*price < amount_value:
+    if n_balance < amount_value:
         return templates.TemplateResponse("buy.html", {
             "request": request,
             "user" : user,
