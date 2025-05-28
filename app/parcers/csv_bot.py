@@ -49,10 +49,7 @@ async def get_current_rates():
             if not df.empty:
                 pair = file.stem.replace('_', '/')
                 last_row = df.iloc[-1]
-                rates[pair] = {
-                    'price': f"{float(last_row['Close']):.5f}",
-                    'date': last_row['Price']
-                }
+                rates[pair] = f"{float(last_row['Close']):.5f}"  # Сохраняем только цену
         except Exception as e:
             print(f"Ошибка чтения {file}: {e}")
     return rates
@@ -73,9 +70,8 @@ async def send_rates(context: CallbackContext, chat_id=None):
             return
 
         message = "📊 <b>Текущие курсы:</b>\n\n"
-        for pair, data in rates.items():
-            message += f"<b>{pair}</b>: {data['price']}\n"
-            message += f"<i>Обновлено: {data['date']}</i>\n\n"
+        for pair, price in rates.items():
+            message += f"<b>{pair}</b>: {price}\n"  # Только пара и цена без времени
 
         await context.bot.send_message(
             chat_id,
@@ -142,8 +138,7 @@ async def set_update_interval(update: Update, context: ContextTypes.DEFAULT_TYPE
         interval_text = f"{hours} час" + ("а" if 1 < hours < 5 else "" if hours == 1 else "ов")
 
     await update.message.reply_text(
-        f"✅ Интервал обновления установлен: каждые {interval_text}\n"
-        f"Следующее обновление через 1 минуту...",
+        f"✅ Интервал обновления установлен: каждые {interval_text}",
         reply_markup=main_keyboard
     )
 
