@@ -3,20 +3,18 @@ from __future__ import annotations
 import argparse
 import sys
 import time
-from datetime import UTC, datetime, timedelta
+from datetime import timezone, datetime, timedelta
 from pathlib import Path
 
 import pandas as pd
 import yfinance as yf
 from pandas.errors import EmptyDataError
 
-# ─── ПАРАМЕТРЫ CLI ─────────────────────────────────────
 parser = argparse.ArgumentParser(description="BTC_USD CSV updater")
 parser.add_argument("--start", type=str, help="2021-05-24")
 parser.add_argument("--end",   type=str, help="2025-05-25")
 args = parser.parse_args()
 
-# ─── КОНСТАНТЫ ─────────────────────────────────────────
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -24,9 +22,7 @@ CSV_PATH = DATA_DIR / "BTC_USD.csv"
 COLS = ["Price", "Close", "High", "Low", "Open", "Volume"]
 
 
-# ─── УТИЛИТЫ ───────────────────────────────────────────
 def df_from_yf(data: pd.DataFrame) -> pd.DataFrame:
-    """yfinance DF -> нужные колонки и порядок"""
     if data.empty:
         return pd.DataFrame(columns=COLS)
     data.reset_index(inplace=True)
@@ -39,7 +35,7 @@ def df_from_yf(data: pd.DataFrame) -> pd.DataFrame:
 
 def save(df: pd.DataFrame):
     df.to_csv(CSV_PATH, index=False)
-    print(f"[{datetime.now(UTC):%H:%M:%S}] CSV сохранён ({len(df)} строк)")
+    print(f"[{datetime.now(timezone.utc):%H:%M:%S}] CSV сохранён ({len(df)} строк)")
 
 
 def read_csv_safely(path: Path) -> pd.DataFrame:
@@ -49,10 +45,9 @@ def read_csv_safely(path: Path) -> pd.DataFrame:
         return pd.DataFrame(columns=COLS)
 
 
-# ─── 1. ЕСЛИ УКАЗАН ДИАПАЗОН — ТОЛЬКО СКАЧАТЬ И ВЫЙТИ ─
 if args.start:
     start_iso = args.start
-    end_iso   = args.end or (datetime.now(UTC).date().isoformat())
+    end_iso   = args.end or (datetime.now(timezone.utc).date().isoformat())
     # yfinance `end` не включителен → смещаем на +1 день
     end_plus  = (datetime.fromisoformat(end_iso).date() + timedelta(days=1)).isoformat()
 
@@ -71,7 +66,6 @@ if args.start:
     save(csv_df)
     sys.exit(0)
 
-# ─── 2. ОБЫЧНЫЙ РЕЖИМ (live-апдейт) ───────────────────
 if not CSV_PATH.exists():
     print("BTC_USD.csv не найден – скачиваю всю историю…")
     hist = yf.download("BTC-USD", period="max", interval="1d", progress=False)
@@ -81,10 +75,10 @@ df = read_csv_safely(CSV_PATH)
 if "Date" in df.columns and "Price" not in df.columns:
     df.rename(columns={"Date": "Price"}, inplace=True)
 
-today_iso = datetime.now(UTC).date().isoformat()
+today_iso = datetime.now(timezone.utc).date().isoformat()
 if df.empty or df["Price"].iloc[-1] != today_iso:
     print("Добавляю дневную свечу за сегодня…")
-    tomorrow = (datetime.now(UTC).date() + timedelta(days=1)).isoformat()
+    tomorrow = (datetime.now(timezone.utc).date() + timedelta(days=1)).isoformat()
     daily = yf.download("BTC-USD", start=today_iso, end=tomorrow,
                         interval="1d", progress=False)
     df = pd.concat([df, df_from_yf(daily)], ignore_index=True)
@@ -92,7 +86,7 @@ if df.empty or df["Price"].iloc[-1] != today_iso:
     df = df[COLS]
     save(df)
 
-print("⏳ Старт live-обновления (каждые 10 с)…")
+
 while True:
     try:
         minute = yf.download("BTC-USD", period="1d",
